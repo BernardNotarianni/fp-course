@@ -131,8 +131,8 @@ length l =
 --
 -- prop> \x -> map id x == x
 map :: (a -> b) -> List a -> List b
-map =
-  error "todo: Course.List#map"
+map _ Nil = Nil
+map f (h :. t) = f h :. map f t
 
 -- | Return elements satisfying the given predicate.
 --
@@ -144,12 +144,11 @@ map =
 -- prop> \x -> filter (const True) x == x
 --
 -- prop> \x -> filter (const False) x == Nil
-filter ::
-  (a -> Bool)
-  -> List a
-  -> List a
-filter =
-  error "todo: Course.List#filter"
+filter :: (a -> Bool) -> List a -> List a
+filter _ Nil = Nil
+filter f (h :. t)
+  | f h = h :. filter f t
+  | otherwise = filter f t
 
 -- | Append two lists to a new list.
 --
