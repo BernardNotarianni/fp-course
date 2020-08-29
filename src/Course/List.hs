@@ -256,12 +256,14 @@ seqOptional lo =
 --
 -- >>> find (const True) infinity
 -- Full 0
-find ::
-  (a -> Bool)
-  -> List a
-  -> Optional a
-find =
-  error "todo: Course.List#find"
+find :: (a -> Bool) -> List a -> Optional a
+find f l =
+  let
+    firstOne Nil = Empty
+    firstOne (x :. _) = Full x
+    filtered = filter f l
+  in
+    firstOne filtered
 
 -- | Determine if the length of the given list is greater than 4.
 --
@@ -276,11 +278,8 @@ find =
 --
 -- >>> lengthGT4 infinity
 -- True
-lengthGT4 ::
-  List a
-  -> Bool
-lengthGT4 =
-  error "todo: Course.List#lengthGT4"
+lengthGT4 :: List a -> Bool
+lengthGT4 l = length l > 4
 
 -- | Reverse a list.
 --
@@ -293,11 +292,9 @@ lengthGT4 =
 -- prop> \x -> let types = x :: List Int in reverse x ++ reverse y == reverse (y ++ x)
 --
 -- prop> \x -> let types = x :: Int in reverse (x :. Nil) == x :. Nil
-reverse ::
-  List a
-  -> List a
-reverse =
-  error "todo: Course.List#reverse"
+reverse :: List a -> List a
+reverse Nil = Nil
+reverse (x :. xs) = reverse xs ++ (x :. Nil)
 
 -- | Produce an infinite `List` that seeds with the given value at its head,
 -- then runs the given function for subsequent elements
@@ -307,10 +304,7 @@ reverse =
 --
 -- >>> let (x:.y:.z:.w:._) = produce (*2) 1 in [x,y,z,w]
 -- [1,2,4,8]
-produce ::
-  (a -> a)
-  -> a
-  -> List a
+produce :: (a -> a) -> a -> List a
 produce f x = x :. produce f (f x)
 
 -- | Do anything other than reverse a list.
