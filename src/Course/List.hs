@@ -162,12 +162,10 @@ filter f (h :. t)
 -- prop> \x -> (x ++ y) ++ z == x ++ (y ++ z)
 --
 -- prop> \x -> x ++ Nil == x
-(++) ::
-  List a
-  -> List a
-  -> List a
-(++) =
-  error "todo: Course.List#(++)"
+(++) :: List a -> List a -> List a
+(++) Nil y = y
+(++) (x :. xs) y = x :. (xs ++ y)
+
 
 infixr 5 ++
 
@@ -181,11 +179,14 @@ infixr 5 ++
 -- prop> \x -> headOr x (flatten (y :. infinity :. Nil)) == headOr 0 y
 --
 -- prop> \x -> sum (map length x) == length (flatten x)
-flatten ::
-  List (List a)
-  -> List a
-flatten =
-  error "todo: Course.List#flatten"
+flatten :: List (List a) -> List a
+flatten listOfList=
+  let
+    concatene :: List a -> List a -> List a
+    concatene l acc = l ++ acc
+  in
+    foldRight concatene Nil listOfList
+
 
 -- | Map a function then flatten to a list.
 --
@@ -197,22 +198,15 @@ flatten =
 -- prop> \x -> headOr x (flatMap id (y :. infinity :. Nil)) == headOr 0 y
 --
 -- prop> \x -> flatMap id (x :: List (List Int)) == flatten x
-flatMap ::
-  (a -> List b)
-  -> List a
-  -> List b
-flatMap =
-  error "todo: Course.List#flatMap"
+flatMap :: (a -> List b) -> List a -> List b
+flatMap f l = flatten $ map f l
 
 -- | Flatten a list of lists to a list (again).
 -- HOWEVER, this time use the /flatMap/ function that you just wrote.
 --
 -- prop> \x -> let types = x :: List (List Int) in flatten x == flattenAgain x
-flattenAgain ::
-  List (List a)
-  -> List a
-flattenAgain =
-  error "todo: Course.List#flattenAgain"
+flattenAgain :: List (List a) -> List a
+flattenAgain  = flatMap id
 
 -- | Convert a list of optional values to an optional list of values.
 --
@@ -236,11 +230,15 @@ flattenAgain =
 --
 -- >>> seqOptional (Empty :. map Full infinity)
 -- Empty
-seqOptional ::
-  List (Optional a)
-  -> Optional (List a)
-seqOptional =
-  error "todo: Course.List#seqOptional"
+seqOptional :: List (Optional a) -> Optional (List a)
+seqOptional lo =
+  let
+    collect ::  Optional a -> Optional (List a) -> Optional (List a)
+    collect _ Empty = Empty
+    collect Empty _ = Empty
+    collect (Full x) (Full xs) = Full ( x :. xs)
+  in
+    foldRight collect (Full Nil) lo
 
 -- | Find the first element in the list matching the predicate.
 --
